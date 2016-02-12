@@ -22,7 +22,7 @@ def main(foo, bar):
 ```
 
 Now you can use it.
-```sh
+```
 $ python test.py myfoo mybar
 Foo: myfoo
 Bar: mybar
