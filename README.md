@@ -12,6 +12,34 @@ dont_argue provides the decorator **supply_args** which takes names for command
 line arguments and will map those arguments to function arguments of the same
 name.
 ```python
+from dont_argue import supply_args
+
+# If we don't specify any arguments in the decorator it will pass all 
+# arguments as a list
+@supply_args()
+def main(*args):
+    print 'Main1:', args
+
+# Or we can use names if we know how many arguments we need.
+@supply_args()
+def main2(arg_one, arg_two, arg_three):
+    print 'Main2:', arg_one, arg_two, arg_three
+
+main()
+main2()
+```
+
+Try it out:
+```
+$ python test.py one two three
+Main1: ['one', 'two', 'three']
+Main2: 'one', 'two', 'three'
+```
+
+If that's all you need, then you're done! Keep reading to require specific
+arguments or command-line options.
+
+```python
 # test.py
 from dont_argue import supply_args
 

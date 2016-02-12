@@ -21,6 +21,11 @@ class supply_args(object):
             if self.args_list:
                 arguments['args'] = extras
 
-            # Call func with our args keyword matched.
-            func(**arguments)
+            # If we weren't passed any args, keep it simple and splat in all
+            # args.
+            if not self.keywords and not self.default_keywords:
+                func(*extras)
+            else:
+                # Call func with our args keyword matched.
+                func(**arguments)
         return wrapper
