@@ -33,9 +33,6 @@ Bar: mybar
 You can also specify keyword arguments by specifying them with a default value.
 Keyword args are set by using --keyword=value or --keyword value.
 ```python
-# test.py
-from dont_argue import supply_args
-
 @supply_args('foo', 'bar', my_key=42, another_key='default value')
 def main(foo, bar, my_key, another_key):
     print 'Foo:', foo
@@ -46,7 +43,6 @@ def main(foo, bar, my_key, another_key):
 main()
 ```
 
-Now you can use it.
 ```
 $ python test.py myfoo mybar --another_key Unicorns
 Foo: myfoo
@@ -64,6 +60,7 @@ another_key Unicorns
 ```
 
 You can pack up extra options into an 'args' argument if you specify args=True.
+Note that you MUST name the argument in your main function 'args'.
 ```python
 @supply_args('foo', 'bar', args=True)
 def main(foo, bar, args):
