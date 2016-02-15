@@ -1,31 +1,36 @@
 import argparse
+from inspect import getargspec
+from functools import partial
 
-class supply_args(object):
-    def __init__(self, *keywords, **default_keywords):
-        self.keywords = keywords
-        self.args_list = default_keywords.pop('args', False)
-        self.default_keywords = default_keywords
+test_args = None
 
-    def __call__(self, func):
-        def wrapper(*args, **kwargs):
-            parser = argparse.ArgumentParser()
-            # add arguments we're expecting
-            for name in self.keywords:
-                parser.add_argument(name, default=None)
+def supply_args(func):
+    # Get argnames through introspection
+    args, _, _, defaults = getargspec(func)
+    parser = argparse.ArgumentParser()
+    # Set up empty defaults rather than None
+    defaults = defaults or []
+    # Keywords match up with the last len(defaults) args
+    keyword_names = args[-len(defaults):] if defaults else []
+    # use the defaults with the keywords and pack them up
+    keywords = {k:v for k,v in zip(keyword_names, defaults)}
+    # Use what's left over as regular arguments
+    args = args[:-len(keyword_names)] if keywords else args
 
-            # add keyword arguments we're expecting
-            for name, default in self.default_keywords.iteritems():
-                parser.add_argument('--' + name, default=default)
-            arguments, extras = parser.parse_known_args()
-            arguments = vars(arguments)
-            if self.args_list:
-                arguments['args'] = extras
+    # Add basic arguments to argparse
+    for arg in args:
+        parser.add_argument(arg)
 
-            # If we weren't passed any args, keep it simple and splat in all
-            # args.
-            if not self.keywords and not self.default_keywords:
-                func(*extras)
-            else:
-                # Call func with our args keyword matched.
-                func(**arguments)
-        return wrapper
+    # add keyword arguments to argparse
+    for keyword, value in keywords.iteritems():
+        parser.add_argument('--' + keyword, default=value)
+
+    # Extras are unexpected arguments, they'll get splatted out.
+    kwargs, extras = parser.parse_known_args(test_args)
+    # Convert from 'Namespace' object
+    kwargs = vars(kwargs)
+
+    # Get all args as a list to avoid weird keyword/splat conflicts
+    combined_args = [kwargs[k] for k in args + keyword_names] + extras
+    # Apply the args and return the function.
+    return partial(func, *combined_args)

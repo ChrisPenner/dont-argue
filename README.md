@@ -1,120 +1,67 @@
 # dont-argue
-Dead-simple minimal argument parsing in python.
+Dead-simple command line arguments for python scripts.
 
-I got sick of wrestling with argparse all the time when all I needed to do was
-get a few simple args from the command line. Use this if you just want to get
-moving as fast as possible. For more complicated things use the built in
-argparse module instead.
+I got sick of re-learning the argparse module every time I just needed to pass
+in a few simple command line arguments for a python script. `dont_argue` skips
+the boring stuff and lets you get started in a flash.
 
 ## Usage
 
-dont_argue provides the decorator **supply_args** which takes names for command
-line arguments and will map those arguments to function arguments of the same
-name.
+**dont\_argue** provides the decorator **supply\_args**, use it on a function
+and that function's arguments will be provided from the command line.
+
+Check it out:
 ```python
+#!/usr/bin/python
 from dont_argue import supply_args
+@supply_args
+def main(name, location, *friends):
+    friends = ', '.join(friends)
+    print 'Hello {} from {} and your friends {}'.format(name, location, friends)
 
-# If we don't specify any arguments in the decorator it will pass all 
-# arguments as a list
-@supply_args()
-def main(*args):
-    print 'Main1:', args
-
-# Or we can use names if we know how many arguments we need.
-@supply_args()
-def main2(arg_one, arg_two, arg_three):
-    print 'Main2:', arg_one, arg_two, arg_three
-
+# Now to kick things off we just call the function, the arguments come from the
+# command line, so we don't give any here.
 main()
-main2()
 ```
 
 Try it out:
 ```
-$ python test.py one two three
-Main1: ['one', 'two', 'three']
-Main2: 'one', 'two', 'three'
+$ ./example.py Joe Alabama Jake Drake
+Hello Joe from Alabama and your friends Jake, Drake
 ```
+If that's all you need, then you're done! Also notice how all the extra
+arguments get packed up into `*friends` as expected.
 
-If that's all you need, then you're done! Keep reading to require specific
-arguments or command-line options.
-
+You can also work with command line options by specifying keyword arguments for
+your function. They can be specified on the command line using the
+`--option=value` or `--option value` syntax.
 ```python
-# test.py
-from dont_argue import supply_args
-
-@supply_args('foo', 'bar')
-def main(foo, bar):
-    print 'Foo:' foo
-    print 'Bar:', bar
-
-main() # Note that we don't supply arguments here
-```
-
-Now you can use it.
-```
-$ python test.py myfoo mybar
-Foo: myfoo
-Bar: mybar
-```
-
-You can also specify keyword arguments (command line options) by specifying
-them with a default value. Keyword args are set by using `--keyword=value` or
-`--keyword value`.
-```python
-# We provide the defaults in the decorator, not in main
-@supply_args('foo', 'bar', my_key=42, another_key='default value')
-def main(foo, bar, my_key, another_key):
-    print 'Foo:', foo
-    print 'Bar:', bar
-    print 'my_key', my_key
-    print 'another_key', another_key
-
+@supply_args
+def main(name, mood='FRIENDLY'):
+    if mood == 'FRIENDLY':
+        print 'Hello {}! Welcome here!'.format(name)
+    elif mood == 'ANGRY':
+        print 'Hey {}! Get out of my house!'.format(name)
 main()
 ```
 
+Now we can specify `mood` or not. Also note that providing too few arguments or
+using the -h flag will display usage information.
 ```
-$ python test.py myfoo mybar --another_key Unicorns
-Foo: myfoo
-Bar: mybar
-my_key: 42
-another_key: Unicorns
-```
-You can also abbreviate options so long as it is unambiguous
-```
-$ python test.py myfoo mybar --a Unicorns
-Foo: myfoo
-Bar: mybar
-my_key 42
-another_key Unicorns
+$ ./test.py Joe
+Hello Joe! Welcome here!
+$ ./example.py Joe --mood ANGRY
+Hey Joe! Get out of my house!
+$ ./example.py -h
+usage: example.py [-h] [--mood MOOD] name
+
+positional arguments:
+  name
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --mood MOOD
 ```
 
-You can pack up extra options into an 'args' argument if you specify args=True.
-Note that you MUST name the argument in your main function 'args'.
-```python
-# We don't use *args, that's taken care of in the decorator.
-@supply_args('foo', 'bar', args=True)
-def main(foo, bar, args):
-    print 'Foo:', foo
-    print 'Bar:', bar
-    print 'args:', args
-
-main()
-```
-
-```
-$ python test.py myfoo mybar one two three
-Foo: myfoo
-Bar: mybar
-args: ['one', 'two', 'three']
-```
-
-If no extra args are provided, args will be set to the empty list `[]`.
-
-dont_argue will provide useage information if provided too few arguments or run
-with the -h flag.
-```
-$ python test.py
-usage: test.py [-h] [--another_key ANOTHER_KEY] [--my_key MY_KEY] foo bar
-test.py: error: too few arguments
-```
+**dont_argue** can't handle keyword arguments that you don't explicitly
+specify, so `**kwargs` doesn't tend to work.
