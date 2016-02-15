@@ -63,5 +63,6 @@ optional arguments:
   --mood MOOD
 ```
 
-**dont_argue** can't handle keyword arguments that you don't explicitly
-specify, so `**kwargs` doesn't tend to work.
+Arbitrary keyword arguments don't make a ton of sense on the command line, so
+you must explicitly declare your keyword arguments, `**kwargs` won't work with
+command line options.
