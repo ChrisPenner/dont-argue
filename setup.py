@@ -3,16 +3,19 @@ from distutils.core import setup
 with open('README.md') as f:
     long_description = f.read()
 
+version = '0.1.3'
+
 setup(
     name = 'dont_argue',
     packages = ['dont_argue'],
-    version = '0.1.1',
+    package_data={ 'dont_argue': ['README.md'], },
+    version = version,
     description = 'Dead-simple command line argument parsing',
     long_description=long_description,
     author = 'Chris Penner',
     author_email = 'christopher.penner@gmail.com',
     url = 'https://github.com/ChrisPenner/dont-argue',
-    download_url = 'https://github.com/ChrisPenner/dont-argue/releases/tag/v0.1.1', 
+    download_url = 'https://github.com/ChrisPenner/dont-argue/releases/tag/v{}'.format(version), 
     license = 'MIT',
     keywords = ['command line', 'argument', 'parsing', 'argparse'],
     classifiers = [
