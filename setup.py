@@ -12,7 +12,7 @@ setup(
     author = 'Chris Penner',
     author_email = 'christopher.penner@gmail.com',
     url = 'https://github.com/ChrisPenner/dont-argue',
-    download_url = 'https://github.com/ChrisPenner/dont-argue/tarball/0.1', 
+    download_url = 'https://github.com/ChrisPenner/dont-argue/releases/tag/0.1.1', 
     license = 'MIT',
     keywords = ['command line', 'argument', 'parsing', 'argparse'],
     classifiers = [
